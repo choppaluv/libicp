@@ -45,8 +45,8 @@ int main (int argc, char** argv) {
 
   MyMesh m1, m2;
   MyMesh::FaceIterator f1;
-  const char *filename1 = "../source_stl/LowerJaw.stl";
-  const char *filename2 = "../source_stl/DicomModel.stl";
+  const char *filename1 = "../source_stl/DicomModel.stl";
+  const char *filename2 = "../source_stl/LowerJaw.stl";
 
   // import STL file
   int dummy = 0;
