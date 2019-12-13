@@ -16,13 +16,14 @@ PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 libicp; if not, write to the Free Software Foundation, Inc., 51 Franklin
-Street, Fifth Floor, Boston, MA 02110-1301, USA 
+Street, Fifth Floor, Boston, MA 02110-1301, USA
 */
 
 // Demo program showing how libicp can be used
 
 #include <iostream>
 #include <random>
+#include <cmath>
 #include <wrap/io_trimesh/import.h>
 #include <wrap/io_trimesh/export.h>
 #include <vcg/math/matrix44.h>
@@ -30,7 +31,7 @@ Street, Fifth Floor, Boston, MA 02110-1301, USA
 #include "MeshModel.h"
 
 using namespace std;
-
+void visualizeResult(MyMesh& m, kdtree::KDTreeArray pointset, bool pointToPoint = false);
 int main(int argc, char** argv) {
 
 	// define a 3 dim problem with 10000 model points
@@ -59,24 +60,23 @@ int main(int argc, char** argv) {
 		exit(0);
 	}
 
-	// Allocate for all vertices of each mesh.
-	double* A = (double*)calloc(3 * m1.VN(), sizeof(double));
-	double* B = (double*)calloc(3 * m2.VN(), sizeof(double));
+	// Store all vertices of each mesh.
+	kdtree::KDTreeArray A, B;
 
-	int i = 0;
 	for (MyMesh::VertexIterator vi = m1.vert.begin();vi != m1.vert.end();++vi) {
-		A[i * 3 + 0] = (*vi).P()[0];
-		A[i * 3 + 1] = (*vi).P()[1];
-		A[i * 3 + 2] = (*vi).P()[2];
-		i++;
+		std::vector<float> point;
+		point.push_back((*vi).P()[0]);
+		point.push_back((*vi).P()[1]);
+		point.push_back((*vi).P()[2]);
+		A.push_back(point);
 	}
 
-	i = 0;
 	for (MyMesh::VertexIterator vi = m2.vert.begin();vi != m2.vert.end();++vi) {
-		B[i * 3 + 0] = (*vi).P()[0];
-		B[i * 3 + 1] = (*vi).P()[1];
-		B[i * 3 + 2] = (*vi).P()[2];
-		i++;
+		std::vector<float> point;
+		point.push_back((*vi).P()[0]);
+		point.push_back((*vi).P()[1]);
+		point.push_back((*vi).P()[2]);
+		B.push_back(point);
 	}
 
 	std::random_device randDev;
@@ -97,16 +97,16 @@ int main(int argc, char** argv) {
 		indices1.insert(idx1);
 		indices2.insert(idx2);
 
-		M[i * 3 + 0] = A[idx1 * 3 + 0];
-		M[i * 3 + 1] = A[idx1 * 3 + 1];
-		M[i * 3 + 2] = A[idx1 * 3 + 2];
-		T[i * 3 + 0] = B[idx2 * 3 + 0];
-		T[i * 3 + 1] = B[idx2 * 3 + 1];
-		T[i * 3 + 2] = B[idx2 * 3 + 2];
+		M[i * 3 + 0] = A.at(idx1).at(0);
+		M[i * 3 + 1] = A.at(idx1).at(1);
+		M[i * 3 + 2] = A.at(idx1).at(2);
+		T[i * 3 + 0] = B.at(idx2).at(0);
+		T[i * 3 + 1] = B.at(idx2).at(1);
+		T[i * 3 + 2] = B.at(idx2).at(2);
 	}
 
 	// Color the sampled points
-	i = 0;
+	int i = 0;
 	for (MyMesh::VertexIterator vi = m1.vert.begin();vi != m1.vert.end();++vi) {
 		if (indices1.find(i) != indices1.end())
 			(*vi).SetS();
@@ -130,56 +130,125 @@ int main(int argc, char** argv) {
 			(*fi).C() = vcg::Color4b::LightGreen;
 		}
 	}
- 
+
 	for (MyMesh::FaceIterator fi = m2.face.begin(); fi != m2.face.end(); ++fi) if (!(*fi).IsD()) {
 		if ((*fi).V(0)->IsS() || (*fi).V(1)->IsS() || (*fi).V(2)->IsS()) {
 			(*fi).C() = vcg::Color4b::LightRed;
 		}
 	}
 
-  // start with identity as initial transformation
-  // in practice you might want to use some kind of prediction here
-  Matrix R = Matrix::eye(3);
-  Matrix t(3,1);
+	// start with identity as initial transformation
+	// in practice you might want to use some kind of prediction here
+	Matrix R = Matrix::eye(3);
+	Matrix t(3, 1);
 
-  // run point-to-plane ICP (-1 = no outlier threshold)
-  cout << endl << "Running ICP (point-to-plane, no outliers)" << endl;
+	// run point-to-plane ICP (-1 = no outlier threshold)
+	cout << endl << "Running ICP (point-to-plane, no outliers)" << endl;
 
-  float t1 = clock();
-  IcpPointToPlane icp(M,num,dim);
-  double residual = icp.fit(T,num,R,t,-1);
-  cout << "ICP process : " << (clock() - t1) / CLOCKS_PER_SEC << endl;
+	float t1 = clock();
+	IcpPointToPlane icp(M, num, dim);
+	double residual = icp.fit(T, num, R, t, -1);
+	cout << "ICP process : " << (clock() - t1) / CLOCKS_PER_SEC << endl;
 
-  // results
-  cout << endl << "Transformation results:" << endl;
-  cout << "R:" << endl << R << endl << endl;
-  cout << "t:" << endl << t << endl << endl;
-  cout << "Residual:"<<residual;
+	// results
+	cout << endl << "Transformation results:" << endl;
+	cout << "R:" << endl << R << endl << endl;
+	cout << "t:" << endl << t << endl << endl;
+	cout << "Residual:" << residual << endl;
 
-  Matrix Rt = Matrix::inv(R);
-  vcg::Matrix44f transM;
-  for (int i = 0; i < 3; i++) {
-	  for (int j = 0; j < 3; j++) {
-		  transM[i][j] = R.val[i][j];
-	  }
-	  transM[i][3] = t.val[0][i];
-  }
-  transM[3][0] = 0;
-  transM[3][1] = 0;
-  transM[3][2] = 0;
-  transM[3][3] = 1.0;
-
-
-  vcg::tri::io::ExporterSTL<MyMesh>::Save(m1, "../result_stl/translated2.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
-  vcg::tri::UpdatePosition<MyMesh>::Matrix(m2, transM);
-  vcg::tri::io::ExporterSTL<MyMesh>::Save(m2, "../result_stl/translated.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
-  
+	Matrix Rt = Matrix::inv(R);
+	vcg::Matrix44f transM;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			transM[i][j] = R.val[i][j];
+		}
+		transM[i][3] = t.val[0][i];
+	}
+	transM[3][0] = 0;
+	transM[3][1] = 0;
+	transM[3][2] = 0;
+	transM[3][3] = 1.0;
 
 
-  // free memory
-  free(M);
-  free(T);
+	vcg::tri::io::ExporterSTL<MyMesh>::Save(m1, "../result_stl/translated2.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
+	vcg::tri::UpdatePosition<MyMesh>::Matrix(m2, transM);
+	vcg::tri::io::ExporterSTL<MyMesh>::Save(m2, "../result_stl/translated.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
 
-  // success
-  return 0;
+	visualizeResult(m2, A, VISUALIZE_ERROR_METRIC);
+
+	// free memory
+	free(M);
+	free(T);
+
+	// success
+	return 0;
+}
+
+/* Colorize the distance between the STL and DICOM data.
+ * Export colorized mesh for mesh m (STL data).
+ * pointset: Dicom Model point set
+ * pointToPoint: if true, use point-to-point distance (STL face's centroid to nearest point of DICOM) to show the error
+ *               o.w use point-to-plane (distance between the distance of STL face to the nearest point of DICOM to show the error) */
+void visualizeResult(MyMesh& m, kdtree::KDTreeArray pointset, bool pointToPoint) {
+	// Construct kd tree with dicom points.
+	kdtree::KDTree* dicomKDTree = new kdtree::KDTree(pointset);
+	std::vector<float>         centroid(3);
+	kdtree::KDTreeResultVector neighbor;
+
+
+
+	if (!pointToPoint) {
+		vcg::tri::UpdateNormal<MyMesh>::PerFaceNormalized(m);
+	}
+
+
+	for (MyMesh::FaceIterator fi = m.face.begin(); fi != m.face.end(); ++fi) if (!(*fi).IsD()) {
+		centroid[0] = ((*fi).V(0)->P()[0] + (*fi).V(1)->P()[0] + (*fi).V(2)->P()[0]) / 3;
+		centroid[0] = ((*fi).V(0)->P()[1] + (*fi).V(1)->P()[1] + (*fi).V(2)->P()[1]) / 3;
+		centroid[0] = ((*fi).V(0)->P()[2] + (*fi).V(1)->P()[2] + (*fi).V(2)->P()[2]) / 3;
+
+		// Find the nearest point of the face's centroid.
+		dicomKDTree->n_nearest(centroid, 1, neighbor);
+		double dicomPx = dicomKDTree->the_data[neighbor[0].idx][0];
+		double dicomPy = dicomKDTree->the_data[neighbor[0].idx][1];
+		double dicomPz = dicomKDTree->the_data[neighbor[0].idx][2];
+
+
+		// Distance between stl model's face to the nearest dicom model's point.
+		double dist;
+		if (pointToPoint) {
+			dist = sqrt(pow(dicomPx - centroid[0], 2) + pow(dicomPy - centroid[1], 2) + pow(dicomPx - centroid[2], 2));
+
+		}
+		else {
+			dist = (*fi).N()[0] * (dicomPx - centroid[0]) +
+				(*fi).N()[1] * (dicomPx - centroid[1]) +
+				(*fi).N()[2] * (dicomPx - centroid[2]);
+		}
+
+		if (dist < -10) {
+			(*fi).C() = vcg::Color4b::Red;
+		}
+		else if (dist < -5) {
+			(*fi).C() = vcg::Color4b::Blue;
+		}
+		else if (dist < -1) {
+			(*fi).C() = vcg::Color4b::Green;
+		}
+		else if (dist < 1) {
+			(*fi).C() = vcg::Color4b::LightGreen;
+		}
+		else if (dist < 5) {
+			(*fi).C() = vcg::Color4b::LightBlue;
+		}
+		else if (dist < 10) {
+			(*fi).C() = vcg::Color4b::LightRed;
+		}
+		else {
+			(*fi).C() = vcg::Color4b::LightGray;
+		}
+
+	}
+
+	vcg::tri::io::ExporterSTL<MyMesh>::Save(m, "../result_stl/colormap.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
 }

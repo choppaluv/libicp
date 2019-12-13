@@ -8,3 +8,7 @@
 #define MAX_ITER 200
 /* threshold for ICP convergence */
 #define THRESHOLD 1e-4
+/* error metric used in visualization */
+#define VISUALIZE_POINT_TO_POINT true
+#define VISUALIZE_POINT_TO_PLANE false
+#define VISUALIZE_ERROR_METRIC VISUALIZE_POINT_TO_POINT
