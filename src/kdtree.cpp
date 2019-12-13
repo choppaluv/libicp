@@ -208,7 +208,8 @@ namespace kdtree {
       } else if (node->left == NULL) {
         for (int i=0; i<dim; i++)
           node->box[i] = node->right->box[i];
-        node->cut_val =  node->right->box[c].upper;
+        /* TODO(JIWOOKIM): I think this should be node->right->box[c].lower; */
+        node->cut_val =  node->right->box[c].lower;
         node->cut_val_left = node->cut_val_right = node->cut_val;
       } else {
         node->cut_val_right = node->right->box[c].lower;

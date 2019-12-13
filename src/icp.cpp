@@ -22,7 +22,7 @@ Street, Fifth Floor, Boston, MA 02110-1301, USA
 using namespace std;
 
 Icp::Icp (double *M,const int32_t M_num,const int32_t dim) 
-:m_dim(dim), m_max_iter(200), m_min_delta(1e-4) 
+:m_dim(dim), m_max_iter(MAX_ITER), m_min_delta(THRESHOLD) 
 {
   
 	// check for correct dimensionality
@@ -101,4 +101,5 @@ void Icp::fitIterate( double *T,const int32_t T_num,Matrix &R,Matrix &t, double 
 		}
 		delta=fitStep(T,T_num,R,t,m_active);
 	}
+	cout << "iteration: " << iter << endl;
 }
