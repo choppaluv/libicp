@@ -16,7 +16,7 @@
 
 namespace kdtree {
   
-  typedef float KDTreeArray[NUM_SAMPLE_POINTS][DIM];
+  typedef std::vector<std::vector<float> > KDTreeArray;
   
   typedef struct {
     float lower, upper;

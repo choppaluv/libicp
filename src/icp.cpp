@@ -19,6 +19,7 @@ Street, Fifth Floor, Boston, MA 02110-1301, USA
 */
 
 #include "icp.h"
+#include <vector>
 using namespace std;
 
 Icp::Icp (double *M,const int32_t M_num,const int32_t dim) 
@@ -39,9 +40,13 @@ Icp::Icp (double *M,const int32_t M_num,const int32_t dim)
 	}
 
 	// copy model points to M_data
-	for (int32_t m=0; m<M_num; m++)
-		for (int32_t n=0; n<dim; n++)
-		  m_kd_data[m][n] = (float)M[m*dim+n];
+	for (int32_t m = 0; m < M_num; m++) {
+		std::vector<float> point;
+		for (int32_t n = 0; n < dim; n++) {
+			point.push_back((float)M[m*dim + n]);
+		}
+		m_kd_data.push_back(point);
+	}
 
 	// build a kd tree from the model point cloud
 	m_kd_tree = new kdtree::KDTree(m_kd_data);

@@ -68,8 +68,8 @@ double IcpPointToPlane::fitStep (double *T,const int32_t T_num,Matrix &R,Matrix 
       m_kd_tree->n_nearest(query,1,result);
 
       // model point
-      double dx = m_kd_tree->the_data[result[0].idx][0];
-      double dy = m_kd_tree->the_data[result[0].idx][1];
+      double dx = m_kd_tree->the_data.at(result[0].idx).at(0);
+      double dy = m_kd_tree->the_data.at(result[0].idx).at(1);
 
       // model point normal
       double nx = M_normal[result[0].idx*2+0];
@@ -154,9 +154,9 @@ double IcpPointToPlane::fitStep (double *T,const int32_t T_num,Matrix &R,Matrix 
       m_kd_tree->n_nearest(query,1,result);
 
       // model point
-      double dx = m_kd_tree->the_data[result[0].idx][0];
-      double dy = m_kd_tree->the_data[result[0].idx][1];
-      double dz = m_kd_tree->the_data[result[0].idx][2];
+      double dx = m_kd_tree->the_data.at(result[0].idx).at(0);
+      double dy = m_kd_tree->the_data.at(result[0].idx).at(1);
+      double dz = m_kd_tree->the_data.at(result[0].idx).at(2);
 
       // model point normal
       double nx = M_normal[result[0].idx*3+0];
@@ -249,8 +249,8 @@ std::vector<int32_t> IcpPointToPlane::getInliers (double *T,const int32_t T_num,
       m_kd_tree->n_nearest(query,1,neighbor);
 
       // model point
-      double dx = m_kd_tree->the_data[neighbor[0].idx][0];
-      double dy = m_kd_tree->the_data[neighbor[0].idx][1];
+      double dx = m_kd_tree->the_data.at(neighbor[0].idx).at(0);
+      double dy = m_kd_tree->the_data.at(neighbor[0].idx).at(1);
 
       // model point normal
       double nx = M_normal[neighbor[0].idx*2+0];
@@ -282,9 +282,9 @@ std::vector<int32_t> IcpPointToPlane::getInliers (double *T,const int32_t T_num,
       m_kd_tree->n_nearest(query,1,neighbor);
 
       // model point
-      double dx = m_kd_tree->the_data[neighbor[0].idx][0];
-      double dy = m_kd_tree->the_data[neighbor[0].idx][1];
-      double dz = m_kd_tree->the_data[neighbor[0].idx][2];
+      double dx = m_kd_tree->the_data.at(neighbor[0].idx).at(0);
+      double dy = m_kd_tree->the_data.at(neighbor[0].idx).at(1);
+      double dz = m_kd_tree->the_data.at(neighbor[0].idx).at(2);
 
       // model point normal
       double nx = M_normal[neighbor[0].idx*3+0];
@@ -310,8 +310,8 @@ void IcpPointToPlane::computeNormal (const kdtree::KDTreeResultVector &neighbors
     Matrix P(neighbors.size(),2);
     Matrix mu(1,2);
     for (uint32_t i=0; i<neighbors.size(); i++) {
-      double x = m_kd_tree->the_data[neighbors[i].idx][0];
-      double y = m_kd_tree->the_data[neighbors[i].idx][1];
+      double x = m_kd_tree->the_data.at(neighbors[i].idx).at(0);
+      double y = m_kd_tree->the_data.at(neighbors[i].idx).at(1);
       P.val[i][0] = x;
       P.val[i][1] = y;
       mu.val[0][0] += x;
@@ -337,9 +337,9 @@ void IcpPointToPlane::computeNormal (const kdtree::KDTreeResultVector &neighbors
     Matrix P(neighbors.size(),3);
     Matrix mu(1,3);
     for (uint32_t i=0; i<neighbors.size(); i++) {
-      double x = m_kd_tree->the_data[neighbors[i].idx][0];
-      double y = m_kd_tree->the_data[neighbors[i].idx][1];
-      double z = m_kd_tree->the_data[neighbors[i].idx][2];
+      double x = m_kd_tree->the_data.at(neighbors[i].idx).at(0);
+      double y = m_kd_tree->the_data.at(neighbors[i].idx).at(1);
+      double z = m_kd_tree->the_data.at(neighbors[i].idx).at(2);
       P.val[i][0] = x;
       P.val[i][1] = y;
       P.val[i][2] = z;
@@ -404,8 +404,8 @@ double IcpPointToPlane::getResidual( double *T,const int32_t T_num,const Matrix 
 			// search nearest neighbor
 			m_kd_tree->n_nearest(query,1,result);
 			// model point
-			double mx = m_kd_tree->the_data[result[0].idx][0];
-			double my = m_kd_tree->the_data[result[0].idx][1];
+			double mx = m_kd_tree->the_data.at(result[0].idx).at(0);
+			double my = m_kd_tree->the_data.at(result[0].idx).at(1);
 			// model point normal
 			double nx = M_normal[result[0].idx*2+0];
 			double ny = M_normal[result[0].idx*2+1];
@@ -437,9 +437,9 @@ double IcpPointToPlane::getResidual( double *T,const int32_t T_num,const Matrix 
 			m_kd_tree->n_nearest(query,1,result);
 			//
 			// model point
-			double mx = m_kd_tree->the_data[result[0].idx][0];
-			double my = m_kd_tree->the_data[result[0].idx][1];
-			double mz = m_kd_tree->the_data[result[0].idx][2];
+			double mx = m_kd_tree->the_data.at(result[0].idx).at(0);
+			double my = m_kd_tree->the_data.at(result[0].idx).at(1);
+			double mz = m_kd_tree->the_data.at(result[0].idx).at(2);
 
 			// model point normal
 			double nx = M_normal[result[0].idx*3+0];

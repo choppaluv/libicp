@@ -125,15 +125,13 @@ int main(int argc, char** argv) {
 	}
 
 	// Since Vertex Coloring is not supported for exporting stl, set the color for the faces.
-	for (MyMesh::FaceIterator fi = m1.face.begin(); fi != m1.face.end(); ++fi) if (!(*fi).IsD())
-	{
+	for (MyMesh::FaceIterator fi = m1.face.begin(); fi != m1.face.end(); ++fi) if (!(*fi).IsD()) {
 		if ((*fi).V(0)->IsS() || (*fi).V(1)->IsS() || (*fi).V(2)->IsS()) {
 			(*fi).C() = vcg::Color4b::LightGreen;
 		}
 	}
  
-	for (MyMesh::FaceIterator fi = m2.face.begin(); fi != m2.face.end(); ++fi) if (!(*fi).IsD())
-	{
+	for (MyMesh::FaceIterator fi = m2.face.begin(); fi != m2.face.end(); ++fi) if (!(*fi).IsD()) {
 		if ((*fi).V(0)->IsS() || (*fi).V(1)->IsS() || (*fi).V(2)->IsS()) {
 			(*fi).C() = vcg::Color4b::LightRed;
 		}
@@ -185,4 +183,3 @@ int main(int argc, char** argv) {
   // success
   return 0;
 }
-

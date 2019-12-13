@@ -93,10 +93,12 @@ namespace kdtree {
       
       // permute the data for it.
       for (int i=0; i<N; i++) {
+        std::vector<float> rearr_data;
         for (int j=0; j<dim; j++) {
-          rearranged_data[i][j] = the_data[ind[i]][j];
+          rearr_data.push_back(the_data.at(ind[i]).at(j));
           // wouldn't F90 be nice here?
         }
+        rearranged_data.push_back(rearr_data);
       }
       data = &rearranged_data;
     } else {
@@ -610,7 +612,7 @@ namespace kdtree {
         early_exit = false;
         dis = 0.0;
         for (int k=0; k<dim; k++) {
-          dis += squared(data[i][k] - sr.qv[k]);
+          dis += squared(data.at(i).at(k) - sr.qv[k]);
           if (dis > ballsize) {
             early_exit=true;
             break;
@@ -632,7 +634,7 @@ namespace kdtree {
         early_exit = false;
         dis = 0.0;
         for (int k=0; k<dim; k++) {
-          dis += squared(data[indexofi][k] - sr.qv[k]);
+          dis += squared(data.at(indexofi).at(k) - sr.qv[k]);
           if (dis > ballsize) {
             early_exit= true;
             break;
@@ -700,7 +702,7 @@ namespace kdtree {
         early_exit = false;
         dis = 0.0;
         for (int k=0; k<dim; k++) {
-          dis += squared(data[i][k] - sr.qv[k]);
+          dis += squared(data.at(i).at(k) - sr.qv[k]);
           if (dis > ballsize) {
             early_exit=true;
             break;
