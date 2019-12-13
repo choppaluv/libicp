@@ -71,8 +71,8 @@ namespace kdtree {
   // constructor
   KDTree::KDTree(KDTreeArray& data_in, bool rearrange_in, int dim_in)
   : the_data(data_in),
-          N  ( data_in.shape()[0] ),
-          dim( data_in.shape()[1] ),
+          N  ( NUM_SAMPLE_POINTS ),
+          dim( DIM ),
           sort_results(false),
           rearrange(rearrange_in),
           root(NULL),
@@ -90,7 +90,6 @@ namespace kdtree {
     if (rearrange) {
       // if we have a rearranged tree.
       // allocate the memory for it.
-      rearranged_data.resize( boost::extents[N][dim] );
       
       // permute the data for it.
       for (int i=0; i<N; i++) {

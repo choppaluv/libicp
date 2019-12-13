@@ -4,12 +4,10 @@ project (libicp)
 
 # directories
 set (LIBICP_SRC_DIR src)
-FIND_PATH(BOOST_DIR "boost")
 FIND_PATH(VCG_DIR "vcg")
 
 # include directory
 include_directories("${LIBICP_SRC_DIR}")
-include_directories("${BOOST_DIR}")
 include_directories("${VCG_DIR}")
 
 # determine if OpenMP can/should be used

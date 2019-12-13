@@ -35,8 +35,9 @@ int main (int argc, char** argv) {
 
   // define a 3 dim problem with 10000 model points
   // and 10000 template points:
-  int32_t dim = 3;
-  int32_t num = 10000;
+  // This configuration can be changed in config.h file.
+  int32_t dim = DIM;
+  int32_t num = NUM_SAMPLE_POINTS;
 
   // allocate model and template memory
   double* M = (double*)calloc(3*num,sizeof(double));
@@ -96,11 +97,11 @@ int main (int argc, char** argv) {
 	  int idx2 = distrB(generator);
 
 	  M[i*3+0] = A[idx1*3+0];
-	  M[i * 3 + 1] = A[idx1 * 3 + 1];
-	  M[i * 3 + 2] = A[idx1 * 3 + 2];
-	  T[i * 3 + 0] = B[idx2 * 3 + 0];
-	  T[i * 3 + 1] = B[idx2 * 3 + 1];
-	  T[i * 3 + 2] = B[idx2 * 3 + 2];
+	  M[i*3+1] = A[idx1*3+1];
+	  M[i*3+2] = A[idx1*3+2];
+	  T[i*3+0] = B[idx2*3+0];
+	  T[i*3+1] = B[idx2*3+1];
+	  T[i*3+2] = B[idx2*3+2];
   }
 
 

@@ -9,16 +9,14 @@
 // Implement a kd tree for fast searching of points in a fixed data base
 // in k-dimensional Euclidean space.
 
+#include "config.h"
+
 #include <vector>
 #include <algorithm>
 
-#include <boost/multi_array.hpp>
-#include <boost/array.hpp>
-
 namespace kdtree {
   
-  typedef boost::multi_array<float, 2>           KDTreeArray;
-  typedef boost::const_multi_array_ref<float, 2> KDTreeROArray;
+  typedef float KDTreeArray[NUM_SAMPLE_POINTS][DIM];
   
   typedef struct {
     float lower, upper;
