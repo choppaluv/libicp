@@ -446,7 +446,7 @@ double IcpPointToPlane::getResidual( double *T,const int32_t T_num,const Matrix 
 			double ny = M_normal[result[0].idx*3+1];
 			double nz = M_normal[result[0].idx*3+2];
 
-			residual += nx * (mx-tx) + ny * (my-ty) + nz * (mz-tz);
+			residual += abs(nx * (mx-tx) + ny * (my-ty) + nz * (mz-tz));
 		}
 	}
 	residual /= nact;
