@@ -29,9 +29,10 @@ Street, Fifth Floor, Boston, MA 02110-1301, USA
 #include <vcg/math/matrix44.h>
 #include "icpPointToPlane.h"
 #include "MeshModel.h"
+#include "config.h"
 
 using namespace std;
-void visualizeResult(MyMesh& m, kdtree::KDTreeArray pointset, bool pointToPoint = false);
+void visualizeResult(MyMeshOcf& m, kdtree::KDTreeArray pointset, bool pointToPoint = false);
 int main(int argc, char** argv) {
 
 	// define a 3 dim problem with 10000 model points
@@ -44,18 +45,18 @@ int main(int argc, char** argv) {
 	double* M = (double*)calloc(3 * num, sizeof(double));
 	double* T = (double*)calloc(3 * num, sizeof(double));
 
-	MyMesh m1, m2;
-	const char *filename1 = "../source_stl/DicomModel.stl";
-	const char *filename2 = "../source_stl/LowerJaw.stl";
+	MyMeshOcf m1, m2;
+	const char *filename1 = "../source_stl/translated_new.stl";
+	const char *filename2 = "../source_stl/translated2_new.stl";
 
 	// import STL file
 	int dummy = 0;
-	if (vcg::tri::io::ImporterSTL<MyMesh>::Open(m1, filename1, dummy, 0) != 0) {
+	if (vcg::tri::io::ImporterSTL<MyMeshOcf>::Open(m1, filename1, dummy, 0) != 0) {
 		std::printf("Error reading file  %s\n", filename1);
 		exit(0);
 	}
 
-	if (vcg::tri::io::ImporterSTL<MyMesh>::Open(m2, filename2, dummy, 0) != 0) {
+	if (vcg::tri::io::ImporterSTL<MyMeshOcf>::Open(m2, filename2, dummy, 0) != 0) {
 		std::printf("Error reading file  %s\n", filename2);
 		exit(0);
 	}
@@ -63,7 +64,7 @@ int main(int argc, char** argv) {
 	// Store all vertices of each mesh.
 	kdtree::KDTreeArray A, B;
 
-	for (MyMesh::VertexIterator vi = m1.vert.begin();vi != m1.vert.end();++vi) {
+	for (MyMeshOcf::VertexIterator vi = m1.vert.begin();vi != m1.vert.end();++vi) {
 		std::vector<float> point;
 		point.push_back((*vi).P()[0]);
 		point.push_back((*vi).P()[1]);
@@ -71,7 +72,7 @@ int main(int argc, char** argv) {
 		A.push_back(point);
 	}
 
-	for (MyMesh::VertexIterator vi = m2.vert.begin();vi != m2.vert.end();++vi) {
+	for (MyMeshOcf::VertexIterator vi = m2.vert.begin();vi != m2.vert.end();++vi) {
 		std::vector<float> point;
 		point.push_back((*vi).P()[0]);
 		point.push_back((*vi).P()[1]);
@@ -107,7 +108,7 @@ int main(int argc, char** argv) {
 
 	// Color the sampled points
 	int i = 0;
-	for (MyMesh::VertexIterator vi = m1.vert.begin();vi != m1.vert.end();++vi) {
+	for (MyMeshOcf::VertexIterator vi = m1.vert.begin();vi != m1.vert.end();++vi) {
 		if (indices1.find(i) != indices1.end())
 			(*vi).SetS();
 		else
@@ -116,7 +117,7 @@ int main(int argc, char** argv) {
 	}
 
 	i = 0;
-	for (MyMesh::VertexIterator vi = m2.vert.begin();vi != m2.vert.end();++vi) {
+	for (MyMeshOcf::VertexIterator vi = m2.vert.begin();vi != m2.vert.end();++vi) {
 		if (indices2.find(i) != indices2.end())
 			(*vi).SetS();
 		else
@@ -125,13 +126,13 @@ int main(int argc, char** argv) {
 	}
 
 	// Since Vertex Coloring is not supported for exporting stl, set the color for the faces.
-	for (MyMesh::FaceIterator fi = m1.face.begin(); fi != m1.face.end(); ++fi) if (!(*fi).IsD()) {
+	for (MyMeshOcf::FaceIterator fi = m1.face.begin(); fi != m1.face.end(); ++fi) if (!(*fi).IsD()) {
 		if ((*fi).V(0)->IsS() || (*fi).V(1)->IsS() || (*fi).V(2)->IsS()) {
 			(*fi).C() = vcg::Color4b::LightGreen;
 		}
 	}
 
-	for (MyMesh::FaceIterator fi = m2.face.begin(); fi != m2.face.end(); ++fi) if (!(*fi).IsD()) {
+	for (MyMeshOcf::FaceIterator fi = m2.face.begin(); fi != m2.face.end(); ++fi) if (!(*fi).IsD()) {
 		if ((*fi).V(0)->IsS() || (*fi).V(1)->IsS() || (*fi).V(2)->IsS()) {
 			(*fi).C() = vcg::Color4b::LightRed;
 		}
@@ -169,10 +170,9 @@ int main(int argc, char** argv) {
 	transM[3][2] = 0;
 	transM[3][3] = 1.0;
 
-
-	vcg::tri::io::ExporterSTL<MyMesh>::Save(m1, "../result_stl/translated2.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
-	vcg::tri::UpdatePosition<MyMesh>::Matrix(m2, transM);
-	vcg::tri::io::ExporterSTL<MyMesh>::Save(m2, "../result_stl/translated.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
+	vcg::tri::io::ExporterSTL<MyMeshOcf>::Save(m1, "../result_stl/translated2.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
+	vcg::tri::UpdatePosition<MyMeshOcf>::Matrix(m2, transM);
+	vcg::tri::io::ExporterSTL<MyMeshOcf>::Save(m2, "../result_stl/translated.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
 
 	visualizeResult(m2, A, VISUALIZE_ERROR_METRIC);
 
@@ -189,7 +189,7 @@ int main(int argc, char** argv) {
  * pointset: Dicom Model point set
  * pointToPoint: if true, use point-to-point distance (STL face's centroid to nearest point of DICOM) to show the error
  *               o.w use point-to-plane (distance between the distance of STL face to the nearest point of DICOM to show the error) */
-void visualizeResult(MyMesh& m, kdtree::KDTreeArray pointset, bool pointToPoint) {
+void visualizeResult(MyMeshOcf& m, kdtree::KDTreeArray pointset, bool pointToPoint) {
 	// Construct kd tree with dicom points.
 	kdtree::KDTree* dicomKDTree = new kdtree::KDTree(pointset);
 	std::vector<float>         centroid(3);
@@ -198,11 +198,11 @@ void visualizeResult(MyMesh& m, kdtree::KDTreeArray pointset, bool pointToPoint)
 
 
 	if (!pointToPoint) {
-		vcg::tri::UpdateNormal<MyMesh>::PerFaceNormalized(m);
+		vcg::tri::UpdateNormal<MyMeshOcf>::PerFaceNormalized(m);
 	}
 
 
-	for (MyMesh::FaceIterator fi = m.face.begin(); fi != m.face.end(); ++fi) if (!(*fi).IsD()) {
+	for (MyMeshOcf::FaceIterator fi = m.face.begin(); fi != m.face.end(); ++fi) if (!(*fi).IsD()) {
 		centroid[0] = ((*fi).V(0)->P()[0] + (*fi).V(1)->P()[0] + (*fi).V(2)->P()[0]) / 3;
 		centroid[0] = ((*fi).V(0)->P()[1] + (*fi).V(1)->P()[1] + (*fi).V(2)->P()[1]) / 3;
 		centroid[0] = ((*fi).V(0)->P()[2] + (*fi).V(1)->P()[2] + (*fi).V(2)->P()[2]) / 3;
@@ -226,29 +226,29 @@ void visualizeResult(MyMesh& m, kdtree::KDTreeArray pointset, bool pointToPoint)
 				(*fi).N()[2] * (dicomPx - centroid[2]);
 		}
 
-		if (dist < -10) {
+		if (dist < -10 * ERROR_SCALE) {
 			(*fi).C() = vcg::Color4b::Red;
 		}
-		else if (dist < -5) {
+		else if (dist < -5 * ERROR_SCALE) {
 			(*fi).C() = vcg::Color4b::Blue;
 		}
-		else if (dist < -1) {
+		else if (dist < -1 * ERROR_SCALE) {
 			(*fi).C() = vcg::Color4b::Green;
 		}
-		else if (dist < 1) {
+		else if (dist < 1 * ERROR_SCALE) {
 			(*fi).C() = vcg::Color4b::LightGreen;
 		}
-		else if (dist < 5) {
+		else if (dist < 5 * ERROR_SCALE) {
 			(*fi).C() = vcg::Color4b::LightBlue;
 		}
-		else if (dist < 10) {
+		else if (dist < 10 * ERROR_SCALE) {
 			(*fi).C() = vcg::Color4b::LightRed;
 		}
 		else {
 			(*fi).C() = vcg::Color4b::LightGray;
 		}
-
+		cout << "dist: " << dist << endl;
 	}
 
-	vcg::tri::io::ExporterSTL<MyMesh>::Save(m, "../result_stl/colormap.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
+	vcg::tri::io::ExporterSTL<MyMeshOcf>::Save(m, "../result_stl/colormap.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
 }

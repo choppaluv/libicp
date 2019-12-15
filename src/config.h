@@ -11,4 +11,6 @@
 /* error metric used in visualization */
 #define VISUALIZE_POINT_TO_POINT true
 #define VISUALIZE_POINT_TO_PLANE false
-#define VISUALIZE_ERROR_METRIC VISUALIZE_POINT_TO_POINT
+#define VISUALIZE_ERROR_METRIC VISUALIZE_POINT_TO_PLANE
+/* scale for color map error */
+#define ERROR_SCALE 4
