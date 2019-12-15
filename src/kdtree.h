@@ -9,7 +9,6 @@
 // Implement a kd tree for fast searching of points in a fixed data base
 // in k-dimensional Euclidean space.
 
-#include "config.h"
 
 #include <vector>
 #include <algorithm>

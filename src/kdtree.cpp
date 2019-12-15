@@ -6,6 +6,7 @@
 
 
 #include "kdtree.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <algorithm>
