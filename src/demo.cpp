@@ -247,7 +247,6 @@ void visualizeResult(MyMeshOcf& m, kdtree::KDTreeArray pointset, bool pointToPoi
 		else {
 			(*fi).C() = vcg::Color4b::LightGray;
 		}
-		cout << "dist: " << dist << endl;
 	}
 
 	vcg::tri::io::ExporterSTL<MyMeshOcf>::Save(m, "../result_stl/colormap.stl", true, vcg::tri::io::Mask::IOM_FACECOLOR, 0, 1);
